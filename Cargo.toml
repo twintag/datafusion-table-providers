@@ -50,3 +50,12 @@ datafusion-table-providers = { path = "core" }
 duckdb = { version = "=1.4.4", package = "spiceai_duckdb_fork" } # Forked to add support for duckdb_scan_arrow, pending: https://github.com/duckdb/duckdb-rs/pull/488
 adbc_core = { version = "0.23" }
 adbc_driver_manager = { version = "0.23" }
+
+[patch.crates-io]
+datafusion = { version = "53", git = "https://github.com/twintag/datafusion", branch = "twintag-df53" }
+datafusion-federation = { version = "0.5", git = "https://github.com/twintag/datafusion-federation", branch = "twintag-df53" }
+datafusion-expr = { version = "53", git = "https://github.com/twintag/datafusion", branch = "twintag-df53" }
+datafusion-ffi = { version = "53", git = "https://github.com/twintag/datafusion", branch = "twintag-df53" }
+datafusion-proto = { version = "53", git = "https://github.com/twintag/datafusion", branch = "twintag-df53" }
+datafusion-physical-expr = { version = "53", git = "https://github.com/twintag/datafusion", branch = "twintag-df53" }
+datafusion-physical-plan = { version = "53", git = "https://github.com/twintag/datafusion", branch = "twintag-df53" }
