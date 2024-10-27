@@ -49,3 +49,13 @@ datafusion-physical-expr = { version = "46" }
 datafusion-physical-plan = { version = "46" }
 datafusion-table-providers = { path = "core" }
 duckdb = { version = "=1.2.1", package = "spiceai_duckdb_fork" } # Forked to add support for duckdb_scan_arrow, pending: https://github.com/duckdb/duckdb-rs/pull/488
+
+[patch.crates-io]
+datafusion = { version = "46.0.1", git = "https://github.com/twintag/datafusion", branch = "twintag" }
+datafusion-federation = { version = "0.3.7", git = "https://github.com/twintag/datafusion-federation", branch = "twintag"  }
+datafusion-expr = { version = "46", git = "https://github.com/twintag/datafusion", branch = "twintag"  }
+datafusion-ffi = { version = "46.0.1", git = "https://github.com/twintag/datafusion", branch = "twintag" }
+datafusion-proto = { version = "46.0.1", git = "https://github.com/twintag/datafusion", branch = "twintag" }
+datafusion-physical-expr = { version = "46.0.1", git = "https://github.com/twintag/datafusion", branch = "twintag" }
+datafusion-physical-plan = { version = "46.0.1", git = "https://github.com/twintag/datafusion", branch = "twintag" }
+
