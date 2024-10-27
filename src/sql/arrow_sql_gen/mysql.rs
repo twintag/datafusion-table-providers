@@ -366,44 +366,7 @@ pub fn rows_to_arrow(rows: &[Row], projected_schema: &Option<SchemaRef>) -> Resu
                 }
                 column_type @ (ColumnType::MYSQL_TYPE_STRING
                 | ColumnType::MYSQL_TYPE_VAR_STRING) => {
-                    // Handle MYSQL_TYPE_ENUM value
-                    if column_is_enum_stats[i] {
-                        let Some(builder) = builder else {
-                            return NoBuilderForIndexSnafu { index: i }.fail();
-                        };
-                        let Some(builder) = builder
-                            .as_any_mut()
-                            .downcast_mut::<StringDictionaryBuilder<UInt16Type>>()
-                        else {
-                            return FailedToDowncastBuilderSnafu {
-                                mysql_type: format!("{mysql_type:?}"),
-                            }
-                            .fail();
-                        };
-
-                        let v = handle_null_error(row.get_opt::<String, usize>(i).transpose())
-                            .context(FailedToGetRowValueSnafu {
-                                mysql_type: ColumnType::MYSQL_TYPE_ENUM,
-                            })?;
-
-                        match v {
-                            Some(v) => {
-                                builder.append_value(v);
-                            }
-                            None => builder.append_null(),
-                        }
-                    } else if column_is_binary_stats[i] {
-                        handle_primitive_type!(
-                            builder,
-                            column_type,
-                            BinaryBuilder,
-                            Vec<u8>,
-                            row,
-                            i
-                        );
-                    } else {
-                        handle_primitive_type!(builder, column_type, StringBuilder, String, row, i);
-                    }
+                    handle_primitive_type!(builder, column_type, StringBuilder, String, row, i);
                 }
                 ColumnType::MYSQL_TYPE_DATE => {
                     let Some(builder) = builder else {
@@ -472,8 +435,9 @@ pub fn rows_to_arrow(rows: &[Row], projected_schema: &Option<SchemaRef>) -> Resu
                     let v =
                         handle_null_error(row.get_opt::<PrimitiveDateTime, usize>(i).transpose())
                             .context(FailedToGetRowValueSnafu {
-                            mysql_type: column_type,
-                        })?;
+                                mysql_type: column_type,
+                            })
+                            .unwrap_or(None);
 
                     match v {
                         Some(v) => {
@@ -548,13 +512,7 @@ pub fn map_column_to_data_type(
         ColumnType::MYSQL_TYPE_ENUM | ColumnType::MYSQL_TYPE_SET => unreachable!(),
         ColumnType::MYSQL_TYPE_STRING
         | ColumnType::MYSQL_TYPE_VAR_STRING => {
-            if column_is_enum {
-                Some(DataType::Dictionary(Box::new(DataType::UInt16), Box::new(DataType::Utf8)))
-            } else if column_is_binary {
-                Some(DataType::Binary)
-            } else {
-                Some(DataType::Utf8)
-            }
+            Some(DataType::Utf8)
         },
         // replication only
         ColumnType::MYSQL_TYPE_TYPED_ARRAY
