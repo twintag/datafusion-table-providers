@@ -137,3 +137,7 @@ sqlite-federation = ["sqlite", "federation"]
 name = "odbc_sqlite"
 path = "examples/odbc_sqlite.rs"
 required-features = ["sqlite", "odbc"]
+
+
+[patch.crates-io]
+datafusion = { version = "44.0.0", git = "https://github.com/twintag/datafusion", branch = "twintag" }
