@@ -108,9 +108,28 @@ pub fn rows_to_arrow(rows: &[Row], projected_schema: &Option<SchemaRef>) -> Resu
         for column in row.columns().iter() {
             let column_name = column.name_str();
             let column_type = column.column_type();
-            let column_is_binary = column.flags().contains(ColumnFlags::BINARY_FLAG);
+            let mut column_is_binary = column.flags().contains(ColumnFlags::BINARY_FLAG);
             let column_is_enum = column.flags().contains(ColumnFlags::ENUM_FLAG);
             let column_use_large_str_or_blob = column.column_length() > 2_u32.pow(31) - 1;
+
+            // When a projected_schema is provided (from get_schema via SHOW COLUMNS),
+            // prefer its type over the wire protocol BINARY_FLAG. MySQL sets BINARY_FLAG
+            // for columns with binary collation (e.g. utf8mb4_bin) even though the column
+            // is logically a string type. This causes a mismatch between the schema
+            // (Utf8) and the data (Binary). Override column_is_binary to match the schema.
+            if column_is_binary {
+                if let Some(schema) = projected_schema {
+                    if let Ok(field) = schema.field_with_name(&column_name) {
+                        match field.data_type() {
+                            DataType::Utf8 | DataType::LargeUtf8 => {
+                                column_is_binary = false;
+                            }
+
+                            _ => {}
+                        }
+                    }
+                }
+            }
 
             let (decimal_precision, decimal_scale) = match column_type {
                 ColumnType::MYSQL_TYPE_DECIMAL | ColumnType::MYSQL_TYPE_NEWDECIMAL => {
