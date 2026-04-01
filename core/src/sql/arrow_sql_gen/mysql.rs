@@ -604,11 +604,12 @@ pub fn rows_to_arrow(rows: &[Row], projected_schema: &Option<SchemaRef>) -> Resu
     // schema and will panic on type mismatch otherwise.
     if let Some(schema) = projected_schema {
         let batch_schema = batch.schema();
-        let needs_reorder = schema
-            .fields()
-            .iter()
-            .zip(batch_schema.fields())
-            .any(|(expected, actual)| expected.name() != actual.name());
+        let needs_reorder = schema.fields().len() != batch_schema.fields().len()
+            || schema
+                .fields()
+                .iter()
+                .zip(batch_schema.fields())
+                .any(|(expected, actual)| expected.name() != actual.name());
 
         if needs_reorder {
             let mut reordered_columns = Vec::with_capacity(schema.fields().len());
@@ -623,13 +624,6 @@ pub fn rows_to_arrow(rows: &[Row], projected_schema: &Option<SchemaRef>) -> Resu
 
                 reordered_columns.push(batch.column(idx).clone());
                 reordered_fields.push(batch_schema.field(idx).clone());
-            }
-
-            for (idx, field) in batch_schema.fields().iter().enumerate() {
-                if schema.index_of(field.name()).is_err() {
-                    reordered_columns.push(batch.column(idx).clone());
-                    reordered_fields.push(field.as_ref().clone());
-                }
             }
 
             let options =
