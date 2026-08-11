@@ -16,7 +16,20 @@
 # under the License.
 
 [workspace]
-members = ["core", "crates/common", "python", "crates/odbc", "crates/clickhouse", "crates/flightsql", "crates/mongodb", "crates/mysql", "crates/sqlite", "crates/postgres", "crates/duckdb", "crates/adbc"]
+members = [
+    "core",
+    "crates/common",
+    "python",
+    "crates/odbc",
+    "crates/clickhouse",
+    "crates/flightsql",
+    "crates/mongodb",
+    "crates/mysql",
+    "crates/sqlite",
+    "crates/postgres",
+    "crates/duckdb",
+    "crates/adbc",
+]
 resolver = "2"
 
 [workspace.package]
@@ -60,3 +73,12 @@ datafusion-table-providers-adbc = { version = "0.13.0", path = "crates/adbc" }
 duckdb = { version = "=1.10505.0" }
 adbc_core = { version = "0.24" }
 adbc_driver_manager = { version = "0.24" }
+
+[patch.crates-io]
+datafusion = { version = "54", git = "https://github.com/twintag/datafusion", branch = "twintag-df54" }
+datafusion-federation = { version = "0.5", git = "https://github.com/twintag/datafusion-federation", branch = "twintag-df54" }
+datafusion-expr = { version = "54", git = "https://github.com/twintag/datafusion", branch = "twintag-df54" }
+datafusion-ffi = { version = "54", git = "https://github.com/twintag/datafusion", branch = "twintag-df54" }
+datafusion-proto = { version = "54", git = "https://github.com/twintag/datafusion", branch = "twintag-df54" }
+datafusion-physical-expr = { version = "54", git = "https://github.com/twintag/datafusion", branch = "twintag-df54" }
+datafusion-physical-plan = { version = "54", git = "https://github.com/twintag/datafusion", branch = "twintag-df54" }
